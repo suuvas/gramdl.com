@@ -1,4 +1,4 @@
-name = "gramdl"
+name = "gramdl-com"
 compatibility_date = "2024-09-23"
 
 # nodejs_compat enables Node.js-compatible APIs in Cloudflare Workers:
