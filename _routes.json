@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "include": [
+    "/api/*",
+    "/robots.txt"
+  ],
+  "exclude": [
+    "/assets/*",
+    "/*.js",
+    "/*.css",
+    "/*.xml",
+    "/*.png",
+    "/*.jpg",
+    "/*.svg",
+    "/*.ico",
+    "/*.woff2",
+    "/*.woff"
+  ]
+}

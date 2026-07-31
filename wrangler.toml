@@ -1,0 +1,33 @@
+name = "gramdl"
+compatibility_date = "2024-09-23"
+
+# nodejs_compat enables Node.js-compatible APIs in Cloudflare Workers:
+# Buffer, process, crypto, etc. Required for some npm packages if you add them.
+compatibility_flags = ["nodejs_compat"]
+
+# Pages build output directory — the folder containing your static assets.
+# Cloudflare Pages will serve this as the static site.
+pages_build_output_dir = "."
+
+# ── Optional: Cloudflare KV namespace for persistent caching ──────────────────
+# Uncomment and replace the KV namespace ID to enable KV-backed caching
+# (faster than CF Cache API for repeated requests across different PoPs).
+# Create a KV namespace: npx wrangler kv:namespace create GRAMDL_CACHE
+#
+# [[kv_namespaces]]
+# binding = "GRAMDL_CACHE"
+# id      = "REPLACE_WITH_YOUR_KV_NAMESPACE_ID"
+
+# ── Environment variables ─────────────────────────────────────────────────────
+# Set these via the Cloudflare Pages dashboard → Settings → Environment variables
+# DO NOT put real secrets in this file (it gets committed to source control).
+#
+# Required for production:
+#   (none required — SaveInsta provider works without API keys)
+#
+# Optional — enables RapidAPI provider as fallback:
+#   INSTAGRAM_PROVIDER     = "rapidapi"
+#   INSTAGRAM_PROVIDER_API_KEY = "<your_rapidapi_key>"
+
+[vars]
+ENVIRONMENT = "production"

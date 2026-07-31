@@ -1,0 +1,44 @@
+# Cloudflare Pages — custom HTTP headers
+# Applied to every response from this Pages project.
+# https://developers.cloudflare.com/pages/configuration/headers/
+
+# ── Security headers on all routes ──────────────────────────────────────────
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://pagead2.googlesyndication.com https://www.googletagmanager.com https://partner.googleadservices.com https://tpc.googlesyndication.com https://adservice.google.com https://*.adtrafficquality.google; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https: http:; connect-src 'self' https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://adservice.google.com https://*.adtrafficquality.google https://*.googlesyndication.com https://www.google.com; frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://www.google.com https://*.adtrafficquality.google; object-src 'none'; base-uri 'self'
+
+# ── Static assets — long-lived immutable cache ───────────────────────────────
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+# ── Fonts ─────────────────────────────────────────────────────────────────────
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+/*.woff
+  Cache-Control: public, max-age=31536000, immutable
+
+# ── Images ────────────────────────────────────────────────────────────────────
+/*.png
+  Cache-Control: public, max-age=86400
+/*.jpg
+  Cache-Control: public, max-age=86400
+/*.svg
+  Cache-Control: public, max-age=86400
+/*.ico
+  Cache-Control: public, max-age=86400
+
+# ── HTML — revalidate each visit ──────────────────────────────────────────────
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+
+# ── API — never cache at the edge (JS handles caching internally) ────────────
+/api/*
+  Cache-Control: no-store
+  Access-Control-Allow-Origin: *
+  Access-Control-Allow-Methods: GET, POST, OPTIONS
+  Access-Control-Allow-Headers: Content-Type
