@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%"   stop-color="#2563eb"/>
+      <stop offset="100%" stop-color="#7c3aed"/>
+    </linearGradient>
+  </defs>
+  <!-- Rounded square background -->
+  <rect width="512" height="512" rx="110" ry="110" fill="url(#bg)"/>
+  <!-- Download arrow — shaft -->
+  <rect x="224" y="100" width="64" height="210" rx="32" fill="white"/>
+  <!-- Download arrow — chevron head -->
+  <path d="M256 370 L140 254 Q124 238 140 222 Q156 206 172 222 L256 306 L340 222 Q356 206 372 222 Q388 238 372 254 Z" fill="white"/>
+  <!-- Download arrow — tray bar -->
+  <rect x="128" y="380" width="256" height="52" rx="26" fill="white"/>
+</svg>

@@ -2,19 +2,7 @@ name = "gramdl-com"
 compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
-# Worker entry point
-main = "src/index.ts"
+pages_build_output_dir = "."
 
-# Static assets — served by Cloudflare's asset pipeline.
-# not_found_handling = "single-page-application" makes CF automatically serve
-# index.html for any path that doesn't match a file → React Router just works.
-[assets]
-directory = "./dist"
-binding   = "ASSETS"
-not_found_handling = "single-page-application"
-
-# ── Environment variables ──────────────────────────────────────────────────────
-# Set secrets in: Cloudflare Dashboard → Workers → gramdl-com → Settings → Variables
-# (never put real secrets in this file)
 [vars]
 ENVIRONMENT = "production"

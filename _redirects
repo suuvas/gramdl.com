@@ -1,7 +1,2 @@
-# Cloudflare Pages redirects
-# https://developers.cloudflare.com/pages/configuration/redirects/
-
-# ── SPA fallback — route all unmatched paths to index.html ───────────────────
-# This is what makes React Router (wouter) work on direct URL access / refresh.
-# Must be last; more specific rules above take precedence.
+# SPA fallback — all unmatched paths serve index.html
 /*    /index.html    200

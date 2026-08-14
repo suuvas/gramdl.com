@@ -1,158 +1,90 @@
 /**
- * GET /api/proxy-download
- * Cloudflare Pages Function — proxies Instagram CDN files through our edge.
- *
- * Modes:
- *   STABLE: ?id=SHORTCODE&quality=hd&filename=...  (CF-cacheable, preferred)
- *   LEGACY: ?url=CDN_URL&filename=...               (not cacheable, for direct URLs)
- *
- * In STABLE mode the response carries Cache-Control: public, max-age=1800
- * so Cloudflare caches the file at the edge — subsequent downloads within 30min
- * are served free from the nearest PoP with zero origin egress.
+ * GET /api/proxy-download — Cloudflare Pages Function
+ * Streams Instagram CDN files through the CF edge.
+ * Modes: ?id=SHORTCODE&quality=hd  OR  ?url=CDN_URL
  */
-
 import { fetchInstagram } from "../_lib/provider";
 
-// Allowed CDN hostnames (SSRF allowlist)
-const ALLOWED_HOSTS = new Set([
-  "dl.snapcdn.app",
-  "scontent.cdninstagram.com",
-  "instagram.com",
-  "cdninstagram.com",
-  "fbcdn.net",
-  "lookaside.fbsbx.com",
-  "video.cdninstagram.com",
-]);
-
-function isAllowedHost(hostname: string): boolean {
-  if (ALLOWED_HOSTS.has(hostname)) return true;
-  for (const h of ALLOWED_HOSTS) {
-    if (hostname.endsWith(`.${h}`)) return true;
-  }
-  return false;
-}
+const UA = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36";
+const ALLOWED = new Set(["dl.snapcdn.app","scontent.cdninstagram.com","instagram.com","cdninstagram.com","fbcdn.net","lookaside.fbsbx.com","video.cdninstagram.com"]);
+const allowed = (h: string) => ALLOWED.has(h) || [...ALLOWED].some(a => h.endsWith(`.${a}`));
 
 export const onRequestGet: PagesFunction = async (ctx) => {
-  const url   = new URL(ctx.request.url);
+  const url      = new URL(ctx.request.url);
   const id       = url.searchParams.get("id");
   const quality  = url.searchParams.get("quality") ?? "hd";
   const rawUrl   = url.searchParams.get("url");
-  const filename = url.searchParams.get("filename") ?? "gramdl-download";
-
-  const safeFilename = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
-  const isImage      = /\.(jpg|jpeg|png|webp|gif)$/i.test(safeFilename);
+  const filename = (url.searchParams.get("filename") ?? "gramdl-download").replace(/[^a-zA-Z0-9._-]/g, "_");
+  const isImage  = /\.(jpg|jpeg|png|webp|gif)$/i.test(filename);
 
   let cdnUrl: string;
-  let stableMode = false;
+  let stable = false;
 
   if (id) {
-    // ── Stable ID mode ────────────────────────────────────────────────────
-    stableMode = true;
-    const shortcode = id.replace(/[^A-Za-z0-9_-]/g, "");
-    if (!shortcode || shortcode.length < 5) {
-      return err400("Invalid id parameter");
-    }
+    stable = true;
+    const sc = id.replace(/[^A-Za-z0-9_-]/g, "");
+    if (sc.length < 5) return err(400, "Invalid id");
 
-    // Look up in CF Cache
-    const cache      = caches.default;
-    const resultKey  = new Request(`https://gramdl-cache.local/result/${shortcode}`);
-    let   cached     = await cache.match(resultKey);
-    let   resultData: any = cached ? await cached.json() : null;
+    const cache = caches.default;
+    const key   = new Request(`https://gramdl-cache.local/result/${sc}`);
+    let   hit   = await cache.match(key);
+    let   data: any = hit ? await hit.json() : null;
 
-    // Cache miss — re-fetch
-    if (!resultData?.media?.length) {
-      for (const type of ["reel", "p", "tv"]) {
+    if (!data?.media?.length) {
+      for (const t of ["reel","p","tv"]) {
         try {
-          const igUrl = `https://www.instagram.com/${type}/${shortcode}/`;
-          resultData  = await fetchInstagram(igUrl, shortcode, type);
-          const toCache = new Response(JSON.stringify(resultData), {
+          data = await fetchInstagram(`https://www.instagram.com/${t}/${sc}/`, sc, t);
+          ctx.waitUntil(cache.put(key, new Response(JSON.stringify(data), {
             headers: { "Content-Type": "application/json", "Cache-Control": "public, max-age=1800" },
-          });
-          ctx.waitUntil(cache.put(resultKey, toCache));
+          })));
           break;
-        } catch { /* try next type */ }
+        } catch { /* try next */ }
       }
     }
-
-    if (!resultData?.media?.length) {
-      return err404("Download session not found. Please re-fetch the Instagram URL.");
-    }
-
-    const normalise = (s: string) => s.toLowerCase().replace(/\s+/g, "_");
-    const item: any =
-      resultData.media.find((m: any) => normalise(m.quality) === normalise(quality)) ||
-      resultData.media.find((m: any) => m.quality === "HD") ||
-      resultData.media[0];
-
-    if (!item?.url) return err404("Requested quality not available.");
+    if (!data?.media?.length) return err(404, "Session not found. Re-fetch the URL.");
+    const norm = (s: string) => s.toLowerCase().replace(/\s+/g, "_");
+    const item: any = data.media.find((m: any) => norm(m.quality) === norm(quality)) || data.media.find((m: any) => m.quality === "HD") || data.media[0];
+    if (!item?.url) return err(404, "Quality not available");
     cdnUrl = item.url;
-
   } else if (rawUrl) {
-    // ── Legacy URL mode ───────────────────────────────────────────────────
-    let parsed: URL;
-    try { parsed = new URL(rawUrl); } catch { return err400("Invalid URL"); }
-    if (parsed.protocol !== "https:") return err400("Only HTTPS URLs allowed");
-    if (!isAllowedHost(parsed.hostname)) return err400("URL host not permitted");
+    let p: URL;
+    try { p = new URL(rawUrl); } catch { return err(400, "Invalid URL"); }
+    if (p.protocol !== "https:") return err(400, "Only HTTPS");
+    if (!allowed(p.hostname)) return err(400, "Host not permitted");
     cdnUrl = rawUrl;
-
   } else {
-    return err400("Provide 'id' + 'quality', or 'url' parameter");
+    return err(400, "Provide 'id' or 'url' param");
   }
 
-  // ── Fetch from CDN and stream ─────────────────────────────────────────────
   try {
-    const upstream = await fetch(cdnUrl, {
-      headers: isImage
-        ? {
-            "User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-            "Accept":          "image/webp,image/apng,image/*,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.9",
-            "Referer":         "https://www.instagram.com/",
-            "Sec-Fetch-Dest":  "image",
-            "Sec-Fetch-Mode":  "no-cors",
-            "Sec-Fetch-Site":  "cross-site",
-          }
-        : {
-            "User-Agent":      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
-            "Accept":          "video/webm,video/mp4,video/*;q=0.9,*/*;q=0.8",
-            "Accept-Language": "en-US,en;q=0.9",
-            "Referer":         "https://www.instagram.com/",
-            "Sec-Fetch-Dest":  "video",
-            "Sec-Fetch-Mode":  "no-cors",
-            "Sec-Fetch-Site":  "cross-site",
-          },
+    const up = await fetch(cdnUrl, {
+      headers: {
+        "User-Agent":      UA,
+        "Accept":          isImage ? "image/webp,image/*,*/*;q=0.8" : "video/mp4,video/*;q=0.9,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Referer":         "https://www.instagram.com/",
+        "Sec-Fetch-Dest":  isImage ? "image" : "video",
+        "Sec-Fetch-Mode":  "no-cors",
+        "Sec-Fetch-Site":  "cross-site",
+      },
     });
+    if (!up.ok) return err(502, `Upstream ${up.status}`);
 
-    if (!upstream.ok) return err500(`Upstream returned ${upstream.status}`);
-
-    const contentType   = upstream.headers.get("content-type")   || (isImage ? "image/jpeg" : "application/octet-stream");
-    const contentLength = upstream.headers.get("content-length");
-    const disposition   = isImage ? "inline" : "attachment";
-
-    const headers: Record<string, string> = {
-      "Content-Type":        contentType,
-      "Content-Disposition": `${disposition}; filename="${safeFilename}"`,
+    const ct  = up.headers.get("content-type") || (isImage ? "image/jpeg" : "application/octet-stream");
+    const cl  = up.headers.get("content-length");
+    const hdr: Record<string, string> = {
+      "Content-Type":        ct,
+      "Content-Disposition": `${isImage ? "inline" : "attachment"}; filename="${filename}"`,
       "Accept-Ranges":       "bytes",
+      "Cache-Control":       stable ? "public, max-age=1800, s-maxage=1800, immutable" : "private, no-store",
     };
-    if (contentLength) headers["Content-Length"] = contentLength;
-    if (stableMode) {
-      headers["Cache-Control"]                = "public, max-age=1800, s-maxage=1800, immutable";
-      headers["Cloudflare-CDN-Cache-Control"] = "max-age=1800";
-    } else {
-      headers["Cache-Control"] = "private, no-store";
-    }
-
-    // CF Workers supports Response body passthrough — stream directly from CDN to client
-    return new Response(upstream.body, { status: 200, headers });
+    if (cl) hdr["Content-Length"] = cl;
+    return new Response(up.body, { status: 200, headers: hdr });
   } catch (e) {
-    console.error("Proxy error:", e);
-    return err500("Failed to proxy the download");
+    console.error("[proxy]", e);
+    return err(500, "Proxy failed");
   }
 };
 
-const err400 = (msg: string) =>
-  new Response(JSON.stringify({ error: msg }), { status: 400, headers: { "Content-Type": "application/json" } });
-const err404 = (msg: string) =>
-  new Response(JSON.stringify({ error: msg }), { status: 404, headers: { "Content-Type": "application/json" } });
-const err500 = (msg: string) =>
-  new Response(JSON.stringify({ error: msg }), { status: 500, headers: { "Content-Type": "application/json" } });
+const err = (s: number, m: string) =>
+  new Response(JSON.stringify({ error: m }), { status: s, headers: { "Content-Type": "application/json" } });
