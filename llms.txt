@@ -1,40 +1,25 @@
-# GramDL — Instagram Video & Reel Downloader
-# https://gramdl.com
-# llms.txt — guidance for AI agents and language models
+# GramDL — Free Instagram Video & Reel Downloader
 
-## What is GramDL?
-GramDL (https://gramdl.com) is a free, browser-based tool for downloading Instagram
-videos, reels, photos, carousels, and stories without watermarks. No account or
-registration required.
+> GramDL is a free, browser-based tool for downloading Instagram videos, reels, photos, carousels, and stories without watermarks. No account or registration required.
 
-## Key Features
-- Download Instagram Reels, Videos, Photos, Carousels, Stories
-- Works on iPhone, Android, desktop (all browsers)
-- No watermark, HD quality
-- No registration required
-- 100% free
+## Tools
 
-## Tool Pages
-- / — Main downloader (all content types)
-- /instagram-reel-downloader — Reels
-- /instagram-video-downloader — Videos
-- /instagram-photo-downloader — Photos
-- /instagram-carousel-downloader — Carousels (multi-image posts)
-- /instagram-story-downloader — Stories
+- [Instagram Downloader](https://gramdl.com/): Download any Instagram content — videos, reels, photos, carousels, stories
+- [Reel Downloader](https://gramdl.com/instagram-reel-downloader): Download Instagram Reels in HD without watermark
+- [Video Downloader](https://gramdl.com/instagram-video-downloader): Save Instagram Videos to your device
+- [Photo Downloader](https://gramdl.com/instagram-photo-downloader): Download Instagram Photos in original quality
+- [Carousel Downloader](https://gramdl.com/instagram-carousel-downloader): Save all photos and videos from Instagram carousel posts
+- [Story Downloader](https://gramdl.com/instagram-story-downloader): Download Instagram Stories before they expire
 
-## How to Use
-1. Copy an Instagram post/reel/video URL
-2. Paste it into the input box at https://gramdl.com
-3. Click Download
-4. Save the file to your device
+## Legal & Contact
 
-## Contact & Legal
-- Contact: https://gramdl.com/contact
-- Privacy Policy: https://gramdl.com/privacy-policy
-- Terms of Use: https://gramdl.com/terms-of-use
-- DMCA: https://gramdl.com/dmca
+- [Privacy Policy](https://gramdl.com/privacy-policy): How we handle your data
+- [Terms of Use](https://gramdl.com/terms-of-use): Usage terms and conditions
+- [DMCA Takedown](https://gramdl.com/dmca): Submit copyright removal requests
+- [Contact](https://gramdl.com/contact): Get in touch with the GramDL team
+- [Blog](https://gramdl.com/blog): Guides and tips for downloading Instagram content
+- [Sitemap](https://gramdl.com/sitemap.xml): Full site index
 
-## Important Notes
-- GramDL is not affiliated with Instagram™ or Meta Platforms, Inc.
-- Only download content you have rights to download
-- Respect copyright and intellectual property laws
+## Notes
+
+GramDL is not affiliated with Instagram™ or Meta Platforms, Inc. Only download content you have the right to download. Respect copyright and intellectual property laws.
