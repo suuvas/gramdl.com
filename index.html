@@ -11,14 +11,14 @@
     <meta name="google-adsense-account" content="ca-pub-YOUR_ADSENSE_ID" />
     <link rel="canonical" href="https://gramdl.com" />
     
-    <!-- AdSense: global site tag — enables Auto Ads (AI-optimized placements) + manual units -->
-    <!-- Replace ca-pub-YOUR_ADSENSE_ID with your real publisher ID before going live -->
-    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ADSENSE_ID" crossorigin="anonymous"></script>
-
-    <!-- Performance optimization -->
-    <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
-    <link rel="preconnect" href="https://googleads.g.doubleclick.net" />
-    <link rel="dns-prefetch" href="https://www.google-analytics.com" />
+    <!-- Performance: preconnect critical origins early -->
+    <link rel="preconnect" href="https://pagead2.googlesyndication.com" crossorigin />
+    <link rel="preconnect" href="https://googleads.g.doubleclick.net" crossorigin />
+    <link rel="dns-prefetch" href="https://tpc.googlesyndication.com" />
+    <link rel="dns-prefetch" href="https://adservice.google.com" />
+    <!-- AdSense loaded AFTER page is interactive — removes 380 KiB of render-blocking JS -->
+    <!-- Replace ca-pub-YOUR_ADSENSE_ID with your real publisher ID -->
+    <meta name="google-adsense-account" content="ca-pub-YOUR_ADSENSE_ID" />
     <meta name="keywords" content="instagram downloader, download reels, instagram video downloader, save instagram posts" />
     
     <!-- Open Graph tags -->
@@ -125,11 +125,23 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest"         href="/site.webmanifest" />
     <meta name="theme-color"     content="#2563eb" />
-    <script type="module" crossorigin src="/assets/index-DFrvFKd1.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-DO3L0oGg.css">
+    <script type="module" crossorigin src="/assets/index-D-8F3p9m.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-BtQsVQsy.css">
   </head>
   <body>
     <div id="root"></div>
     <!-- This is a replit script which adds a banner on the top of the page when opened in development mode outside the replit environment -->
+    <!-- AdSense: deferred load after page paint to avoid blocking FCP/LCP -->
+    <script>
+      window.addEventListener('load', function() {
+        setTimeout(function() {
+          var s = document.createElement('script');
+          s.async = true;
+          s.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-YOUR_ADSENSE_ID';
+          s.setAttribute('crossorigin', 'anonymous');
+          document.head.appendChild(s);
+        }, 3000);
+      });
+    </script>
   </body>
 </html>

@@ -1,0 +1,40 @@
+# GramDL — Instagram Video & Reel Downloader
+# https://gramdl.com
+# llms.txt — guidance for AI agents and language models
+
+## What is GramDL?
+GramDL (https://gramdl.com) is a free, browser-based tool for downloading Instagram
+videos, reels, photos, carousels, and stories without watermarks. No account or
+registration required.
+
+## Key Features
+- Download Instagram Reels, Videos, Photos, Carousels, Stories
+- Works on iPhone, Android, desktop (all browsers)
+- No watermark, HD quality
+- No registration required
+- 100% free
+
+## Tool Pages
+- / — Main downloader (all content types)
+- /instagram-reel-downloader — Reels
+- /instagram-video-downloader — Videos
+- /instagram-photo-downloader — Photos
+- /instagram-carousel-downloader — Carousels (multi-image posts)
+- /instagram-story-downloader — Stories
+
+## How to Use
+1. Copy an Instagram post/reel/video URL
+2. Paste it into the input box at https://gramdl.com
+3. Click Download
+4. Save the file to your device
+
+## Contact & Legal
+- Contact: https://gramdl.com/contact
+- Privacy Policy: https://gramdl.com/privacy-policy
+- Terms of Use: https://gramdl.com/terms-of-use
+- DMCA: https://gramdl.com/dmca
+
+## Important Notes
+- GramDL is not affiliated with Instagram™ or Meta Platforms, Inc.
+- Only download content you have rights to download
+- Respect copyright and intellectual property laws

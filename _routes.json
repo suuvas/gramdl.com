@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "include": ["/api/*", "/robots.txt"],
+  "include": ["/api/*"],
   "exclude": [
     "/assets/*",
     "/*.js", "/*.css",
